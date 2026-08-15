@@ -199,11 +199,18 @@ C:\Users\mike\Desktop\flag.txt → Flag captured
 ## Real World Impact
 
 ```
-Captured NTLMv2 hash → Pass-the-Hash across network
-Valid credentials → Mimikatz (dump LSASS memory)
-All cached domain credentials → BloodHound AD mapping
-Kerberoasting → Service account compromise
-Domain Controller access → Full domain compromise
+## Real World Impact
+
+In a real engagement this attack chain would mean:
+
+- NTLMv2 hash captured → crack offline → 
+  password potentially reused on other systems
+- Administrator credentials → full control 
+  of the Windows machine
+- WinRM access → read sensitive files, 
+  install backdoors, use as pivot point
+- LLMNR poisoning works silently → 
+  victim never knows their hash was stolen
 ```
 
 A single unsanitized PHP `include()` function led to full Administrator access — demonstrating why input validation and disabling LLMNR are critical security controls.
