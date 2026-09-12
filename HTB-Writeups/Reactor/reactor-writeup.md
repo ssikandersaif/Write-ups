@@ -1,7 +1,7 @@
 # HTB — Reactor
 
 > **Platform:** HackTheBox Academy  
-> **Difficulty:** Medium  
+> **Difficulty:** Easy 
 > **OS:** Linux  
 > **Author:** Syed Saif Sikander  
 
