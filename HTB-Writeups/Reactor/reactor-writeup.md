@@ -98,7 +98,7 @@ To validate findings without manual guesswork, Nuclei was run against the target
 nuclei -target http://10.129.18.115:3000
 ```
 
-![Nuclei Output](Nuclei.png)
+![Nuclei Output](Screenshots/Nuclei.png)
 
 Nuclei immediately flags **[CVE-2025-55182] [critical]** on the target, confirming that the machine is vulnerable and that an exploit template exists.
 
